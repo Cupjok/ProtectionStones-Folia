@@ -7,6 +7,7 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -76,31 +77,31 @@ public final class FoliaScheduler {
             globalRegionScheduler = serverGetGlobalRegionScheduler.invoke(server);
             regionScheduler = serverGetRegionScheduler.invoke(server);
 
-            asyncSchedulerRunNow = asyncScheduler.getClass().getMethod("runNow", JavaPlugin.class, Consumer.class);
-            asyncSchedulerRunDelayed = asyncScheduler.getClass().getMethod("runDelayed", JavaPlugin.class, Consumer.class, long.class, TimeUnit.class);
-            asyncSchedulerRunAtFixedRate = asyncScheduler.getClass().getMethod("runAtFixedRate", JavaPlugin.class, Consumer.class, long.class, long.class, TimeUnit.class);
-            asyncSchedulerCancelTasks = asyncScheduler.getClass().getMethod("cancelTasks", JavaPlugin.class);
+            asyncSchedulerRunNow = asyncScheduler.getClass().getMethod("runNow", Plugin.class, Consumer.class);
+            asyncSchedulerRunDelayed = asyncScheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, long.class, TimeUnit.class);
+            asyncSchedulerRunAtFixedRate = asyncScheduler.getClass().getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class, TimeUnit.class);
+            asyncSchedulerCancelTasks = asyncScheduler.getClass().getMethod("cancelTasks", Plugin.class);
 
-            globalRun = globalRegionScheduler.getClass().getMethod("run", JavaPlugin.class, Consumer.class);
-            globalRunDelayed = globalRegionScheduler.getClass().getMethod("runDelayed", JavaPlugin.class, Consumer.class, long.class);
-            globalRunAtFixedRate = globalRegionScheduler.getClass().getMethod("runAtFixedRate", JavaPlugin.class, Consumer.class, long.class, long.class);
-            globalCancelTasks = globalRegionScheduler.getClass().getMethod("cancelTasks", JavaPlugin.class);
+            globalRun = globalRegionScheduler.getClass().getMethod("run", Plugin.class, Consumer.class);
+            globalRunDelayed = globalRegionScheduler.getClass().getMethod("runDelayed", Plugin.class, Consumer.class, long.class);
+            globalRunAtFixedRate = globalRegionScheduler.getClass().getMethod("runAtFixedRate", Plugin.class, Consumer.class, long.class, long.class);
+            globalCancelTasks = globalRegionScheduler.getClass().getMethod("cancelTasks", Plugin.class);
 
-            regionExecuteLocation = regionScheduler.getClass().getMethod("execute", JavaPlugin.class, Location.class, Runnable.class);
-            regionExecuteChunk = regionScheduler.getClass().getMethod("execute", JavaPlugin.class, World.class, int.class, int.class, Runnable.class);
-            regionRunLocation = regionScheduler.getClass().getMethod("run", JavaPlugin.class, Location.class, Consumer.class);
-            regionRunLocationDelayed = regionScheduler.getClass().getMethod("runDelayed", JavaPlugin.class, Location.class, Consumer.class, long.class);
-            regionRunLocationAtFixedRate = regionScheduler.getClass().getMethod("runAtFixedRate", JavaPlugin.class, Location.class, Consumer.class, long.class, long.class);
-            regionRunChunk = regionScheduler.getClass().getMethod("run", JavaPlugin.class, World.class, int.class, int.class, Consumer.class);
-            regionRunChunkDelayed = regionScheduler.getClass().getMethod("runDelayed", JavaPlugin.class, World.class, int.class, int.class, Consumer.class, long.class);
-            regionRunChunkAtFixedRate = regionScheduler.getClass().getMethod("runAtFixedRate", JavaPlugin.class, World.class, int.class, int.class, Consumer.class, long.class, long.class);
+            regionExecuteLocation = regionScheduler.getClass().getMethod("execute", Plugin.class, Location.class, Runnable.class);
+            regionExecuteChunk = regionScheduler.getClass().getMethod("execute", Plugin.class, World.class, int.class, int.class, Runnable.class);
+            regionRunLocation = regionScheduler.getClass().getMethod("run", Plugin.class, Location.class, Consumer.class);
+            regionRunLocationDelayed = regionScheduler.getClass().getMethod("runDelayed", Plugin.class, Location.class, Consumer.class, long.class);
+            regionRunLocationAtFixedRate = regionScheduler.getClass().getMethod("runAtFixedRate", Plugin.class, Location.class, Consumer.class, long.class, long.class);
+            regionRunChunk = regionScheduler.getClass().getMethod("run", Plugin.class, World.class, int.class, int.class, Consumer.class);
+            regionRunChunkDelayed = regionScheduler.getClass().getMethod("runDelayed", Plugin.class, World.class, int.class, int.class, Consumer.class, long.class);
+            regionRunChunkAtFixedRate = regionScheduler.getClass().getMethod("runAtFixedRate", Plugin.class, World.class, int.class, int.class, Consumer.class, long.class, long.class);
 
             entityGetScheduler = Entity.class.getMethod("getScheduler");
             Class<?> entityScheduler = entityGetScheduler.getReturnType();
-            entityRun = entityScheduler.getMethod("run", JavaPlugin.class, Consumer.class, Runnable.class);
-            entityRunDelayed = entityScheduler.getMethod("runDelayed", JavaPlugin.class, Consumer.class, Runnable.class, long.class);
-            entityRunAtFixedRate = entityScheduler.getMethod("runAtFixedRate", JavaPlugin.class, Consumer.class, Runnable.class, long.class, long.class);
-            entityExecute = entityScheduler.getMethod("execute", JavaPlugin.class, Runnable.class, Runnable.class);
+            entityRun = entityScheduler.getMethod("run", Plugin.class, Consumer.class, Runnable.class);
+            entityRunDelayed = entityScheduler.getMethod("runDelayed", Plugin.class, Consumer.class, Runnable.class, long.class);
+            entityRunAtFixedRate = entityScheduler.getMethod("runAtFixedRate", Plugin.class, Consumer.class, Runnable.class, long.class, long.class);
+            entityExecute = entityScheduler.getMethod("execute", Plugin.class, Runnable.class, Runnable.class, long.class);
             scheduledTaskCancel = entityRun.getReturnType().getMethod("cancel");
             scheduledTaskIsCancelled = entityRun.getReturnType().getMethod("isCancelled");
 
@@ -317,7 +318,7 @@ public final class FoliaScheduler {
                         future.completeExceptionally(new IllegalStateException("Entity is retired"));
                     }
                 }
-            });
+            }, 1L);
             if (result instanceof Boolean && !((Boolean) result).booleanValue() && !future.isDone()) {
                 future.completeExceptionally(new IllegalStateException("Entity is retired"));
             }
@@ -441,11 +442,11 @@ public final class FoliaScheduler {
     }
 
     private static CompatTask invokeGlobalLater(Runnable task, long delayTicks) {
-        return register(new FoliaCompatTask(invokeScheduler(globalRunDelayed, globalRegionScheduler, requirePlugin(), consumer(task), delayTicks)));
+        return register(new FoliaCompatTask(invokeScheduler(globalRunDelayed, globalRegionScheduler, requirePlugin(), consumer(task), normalizeTicks(delayTicks))));
     }
 
     private static CompatTask invokeGlobalTimer(Runnable task, long initialDelayTicks, long periodTicks) {
-        return register(new FoliaCompatTask(invokeScheduler(globalRunAtFixedRate, globalRegionScheduler, requirePlugin(), consumer(task), initialDelayTicks, periodTicks)));
+        return register(new FoliaCompatTask(invokeScheduler(globalRunAtFixedRate, globalRegionScheduler, requirePlugin(), consumer(task), normalizeTicks(initialDelayTicks), normalizeTicks(periodTicks))));
     }
 
     private static CompatTask invokeRegion(Location location, Runnable task) {
@@ -461,11 +462,11 @@ public final class FoliaScheduler {
     }
 
     private static CompatTask invokeRegionLater(Location location, Runnable task, long delayTicks) {
-        return register(new FoliaCompatTask(invokeScheduler(regionRunLocationDelayed, regionScheduler, requirePlugin(), location, consumer(task), delayTicks)));
+        return register(new FoliaCompatTask(invokeScheduler(regionRunLocationDelayed, regionScheduler, requirePlugin(), location, consumer(task), normalizeTicks(delayTicks))));
     }
 
     private static CompatTask invokeRegionTimer(Location location, Runnable task, long initialDelayTicks, long periodTicks) {
-        return register(new FoliaCompatTask(invokeScheduler(regionRunLocationAtFixedRate, regionScheduler, requirePlugin(), location, consumer(task), initialDelayTicks, periodTicks)));
+        return register(new FoliaCompatTask(invokeScheduler(regionRunLocationAtFixedRate, regionScheduler, requirePlugin(), location, consumer(task), normalizeTicks(initialDelayTicks), normalizeTicks(periodTicks))));
     }
 
     private static CompatTask invokeEntity(Entity entity, Runnable task, Runnable retired) {
@@ -475,12 +476,12 @@ public final class FoliaScheduler {
 
     private static CompatTask invokeEntityLater(Entity entity, Runnable task, Runnable retired, long delayTicks) {
         Object scheduler = getEntityScheduler(entity);
-        return register(new FoliaCompatTask(invokeScheduler(entityRunDelayed, scheduler, requirePlugin(), consumer(task), retiredCallback(retired), normalizeEntityDelay(delayTicks))));
+        return register(new FoliaCompatTask(invokeScheduler(entityRunDelayed, scheduler, requirePlugin(), consumer(task), retiredCallback(retired), normalizeTicks(delayTicks))));
     }
 
     private static CompatTask invokeEntityTimer(Entity entity, Runnable task, Runnable retired, long initialDelayTicks, long periodTicks) {
         Object scheduler = getEntityScheduler(entity);
-        return register(new FoliaCompatTask(invokeScheduler(entityRunAtFixedRate, scheduler, requirePlugin(), consumer(task), retiredCallback(retired), normalizeEntityDelay(initialDelayTicks), normalizeEntityDelay(periodTicks))));
+        return register(new FoliaCompatTask(invokeScheduler(entityRunAtFixedRate, scheduler, requirePlugin(), consumer(task), retiredCallback(retired), normalizeTicks(initialDelayTicks), normalizeTicks(periodTicks))));
     }
 
     private static Object getEntityScheduler(Entity entity) {
@@ -523,7 +524,7 @@ public final class FoliaScheduler {
         return retired;
     }
 
-    private static long normalizeEntityDelay(long delayTicks) {
+    private static long normalizeTicks(long delayTicks) {
         return delayTicks < 1L ? 1L : delayTicks;
     }
 
