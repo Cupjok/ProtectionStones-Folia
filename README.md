@@ -3,7 +3,7 @@
 [![Maven Central](https://img.shields.io/maven-central/v/dev.espi/protectionstones.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22dev.espi%22%20AND%20a:%22protectionstones%22)
 ![Open issues](https://img.shields.io/github/issues-raw/espidev/ProtectionStones)
 ![Closed issues](https://img.shields.io/github/issues-closed-raw/espidev/ProtectionStones)
-[![Fork with Claude Code](https://img.shields.io/badge/Built%20with-Claude%20Code-D97757?logo=claudecode&logoColor=white)](https://claude.com/claude-code)
+[![Fork with Claude Code](https://img.shields.io/badge/Fork%20with-Claude%20Code-D97757?logo=claudecode&logoColor=white)](https://claude.com/claude-code)
 
 [Spigot](https://www.spigotmc.org/resources/protectionstones-updated-for-1-13-1-16-wg7.61797/) | [Permissions](https://espidev.gitbook.io/protectionstones/permissions) | [Commands](https://espidev.gitbook.io/protectionstones/commands) | [Configuration](https://espidev.gitbook.io/protectionstones/configuration) | [Placeholders](https://espidev.gitbook.io/protectionstones/placeholders) | [Translations](https://espidev.gitbook.io/protectionstones/translations) | [API Information](https://espidev.gitbook.io/protectionstones/api) | [Javadocs](https://jdps.espi.dev/) | [Dev Builds](https://ci.espi.dev/job/ProtectionStones/)
 
