@@ -215,8 +215,12 @@ public class ListenerClass implements Listener {
                 if (r != null && playerBreakProtection(e.getPlayer(), r)) { // successful
                     e.getClickedBlock().setType(Material.AIR);
                 }
+                return;
             }
         }
+
+        // plain right click on a protection block opens the region menu
+        dev.espi.protectionstones.gui.PSGui.handleRightClick(e);
     }
 
     // this will be the first event handler called in the chain

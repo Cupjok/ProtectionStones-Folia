@@ -115,6 +115,9 @@ permissions:
   protectionstones.admin:
     description: This permission allows users to override all ProtectionStones regions and use /ps admin and /ps reload.
     default: op
+  protectionstones.gui:
+    description: Allows players to open the dialog menu with /ps gui, or by right-clicking their protection block.
+    default: op
   protectionstones.superowner:
     description: Allows players to override region permissions.
     default: op

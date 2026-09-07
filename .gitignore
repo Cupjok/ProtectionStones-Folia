@@ -6,4 +6,4 @@
 /.classpath
 /.project
 /dependency-reduced-pom.xml
-/*.iml
+/*.iml/.DS_Store

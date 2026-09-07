@@ -128,7 +128,7 @@ public class ArgTp implements PSCommandArg {
         return null;
     }
 
-    static void teleportPlayer(Player p, PSRegion r) {
+    public static void teleportPlayer(Player p, PSRegion r) {
         if (r.getTypeOptions() == null) {
             PSL.msg(p, ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured. Please contact an administrator.");
             Bukkit.getLogger().info(ChatColor.RED + "This region is problematic, and the block type (" + r.getType() + ") is not configured.");

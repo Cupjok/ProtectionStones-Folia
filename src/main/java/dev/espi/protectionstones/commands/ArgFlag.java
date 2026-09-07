@@ -349,7 +349,7 @@ public class ArgFlag implements PSCommandArg {
     }
 
     // /ps flag logic (utilizing WG internal /region flag logic)
-    static void setFlag(PSRegion r, CommandSender p, String flagName, String value, String groupValue) {
+    public static void setFlag(PSRegion r, CommandSender p, String flagName, String value, String groupValue) {
         // correct the flag if gui flags are there
         String[] flagSplit = flagName.split(":");
         if (flagSplit.length == 2) flagName = flagSplit[1];

@@ -61,6 +61,7 @@ public class PSCommand extends Command {
         ProtectionStones.getInstance().addCommandArgument(new ArgUnclaim());
         ProtectionStones.getInstance().addCommandArgument(new ArgView());
         ProtectionStones.getInstance().addCommandArgument(new ArgHelp());
+        ProtectionStones.getInstance().addCommandArgument(new dev.espi.protectionstones.gui.ArgGui());
     }
 
     @Override

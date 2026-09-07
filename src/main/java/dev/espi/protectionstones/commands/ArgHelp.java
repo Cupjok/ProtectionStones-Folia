@@ -51,6 +51,7 @@ public class ArgHelp implements PSCommandArg {
         String base = "/" + ProtectionStones.getInstance().getConfigOptions().base_command + " ";
 
         helpMenu.clear();
+        helpMenu.add(new HelpEntry(sendWithPerm(dev.espi.protectionstones.gui.GuiText.COMMAND_HELP.msg(), dev.espi.protectionstones.gui.GuiText.COMMAND_HELP_DESC.msg(), base + "gui"), "protectionstones.gui"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.INFO_HELP.msg(), PSL.INFO_HELP_DESC.msg(), base + "info"), "protectionstones.info"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADDREMOVE_HELP.msg(), PSL.ADDREMOVE_HELP_DESC.msg(), base), "protectionstones.members"));
         helpMenu.add(new HelpEntry(sendWithPerm(PSL.ADDREMOVE_OWNER_HELP.msg(), PSL.ADDREMOVE_OWNER_HELP_DESC.msg(), base), "protectionstones.owners"));

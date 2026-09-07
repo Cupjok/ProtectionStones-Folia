@@ -556,6 +556,9 @@ public class ProtectionStones extends JavaPlugin {
         // init help menu
         ArgHelp.initHelpMenu();
 
+        // init dialog menu settings and messages (gui.yml)
+        dev.espi.protectionstones.gui.PSGui.reload();
+
         // load economy
         if (ProtectionStones.getInstance().economy != null) ProtectionStones.getInstance().economy.stop();
         ProtectionStones.getInstance().economy = new PSEconomy();
