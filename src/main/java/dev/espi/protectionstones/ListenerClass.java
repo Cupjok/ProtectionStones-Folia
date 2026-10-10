@@ -38,8 +38,13 @@ import org.bukkit.World;
 import org.bukkit.block.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.entity.SulfurCube;
+import org.bukkit.entity.TNTPrimed;
+import org.bukkit.entity.Tameable;
 import org.bukkit.entity.WindCharge;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -47,6 +52,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
@@ -470,6 +477,30 @@ public class ListenerClass implements Listener {
             // if block shouldn't be exploded, cancel the event
             e.setCancelled(true);
         }
+    }
+
+    // -=-=- prevent explosion damage to players and animals inside regions, unless a member caused the explosion -=-=-
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onExplosionDamage(EntityDamageEvent e) {
+        if (e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION && e.getCause() != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) return;
+        if (!(e.getEntity() instanceof Player || e.getEntity() instanceof Animals || e.getEntity() instanceof Tameable)) return;
+
+        PSRegion r = PSRegion.fromLocation(e.getEntity().getLocation());
+        if (r == null) return;
+
+        // unknown sources (creepers, sulfur cubes, block explosions) count as outsiders
+        Player responsible = e instanceof EntityDamageByEntityEvent ? getExplosionPlayer(((EntityDamageByEntityEvent) e).getDamager()) : null;
+        if (responsible != null && (r.isOwner(responsible.getUniqueId()) || r.isMember(responsible.getUniqueId()))) return;
+
+        e.setCancelled(true);
+    }
+
+    // returns the player responsible for an explosion damager, or null if unknown
+    private Player getExplosionPlayer(Entity damager) {
+        if (damager instanceof TNTPrimed) damager = ((TNTPrimed) damager).getSource();
+        if (damager instanceof Projectile && ((Projectile) damager).getShooter() instanceof Entity) damager = (Entity) ((Projectile) damager).getShooter();
+        return damager instanceof Player ? (Player) damager : null;
     }
 
     private boolean isInPSRegion(Location l) {
