@@ -32,12 +32,14 @@ import dev.espi.protectionstones.compat.FoliaScheduler;
 import dev.espi.protectionstones.utils.WGUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.*;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.SulfurCube;
 import org.bukkit.entity.WindCharge;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -452,6 +454,10 @@ public class ListenerClass implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onEntityExplode(EntityExplodeEvent e) {
         boolean isWindCharge = e.getEntity() instanceof WindCharge;
+        // sulfur cubes (TNT archetype) are not recognised by WorldGuard flags, so keep their blast out of all PS regions
+        if (e.getEntity() instanceof SulfurCube) {
+            e.blockList().removeIf(b -> isInPSRegion(b.getLocation()));
+        }
         explodeUtil(e.blockList(), e.getLocation().getWorld(), isWindCharge);
     }
 
@@ -464,6 +470,15 @@ public class ListenerClass implements Listener {
             // if block shouldn't be exploded, cancel the event
             e.setCancelled(true);
         }
+    }
+
+    private boolean isInPSRegion(Location l) {
+        RegionManager rm = WGUtils.getRegionManagerWithWorld(l.getWorld());
+        if (rm == null) return false;
+        for (ProtectedRegion r : rm.getApplicableRegions(BlockVector3.at(l.getBlockX(), l.getBlockY(), l.getBlockZ()))) {
+            if (ProtectionStones.isPSRegion(r)) return true;
+        }
+        return false;
     }
 
     private void explodeUtil(List<Block> blockList, World w, boolean isWindCharge) {
